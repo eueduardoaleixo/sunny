@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import SunBlob from "@/components/SunBlob";
 import { getSolar, type Solar } from "@/lib/fusionsolar";
 
 const kwh = (n: number, d = 1) => n.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -22,17 +23,11 @@ async function Painel() {
         <span className={h.cls}>● {h.label}</span>
       </div>
 
-      <section className="mt-14">
-        <p className="text-[17px] text-muted">Gerado hoje</p>
-        <p className="mt-1 flex items-baseline gap-2">
-          <span className="text-[88px] font-bold leading-none tracking-[-0.04em] tabular-nums">{kwh(s.todayKwh)}</span>
-          <span className="text-[26px] font-semibold text-sun">kWh</span>
-        </p>
-        {s.incomeToday != null && (
-          <p className="mt-3 text-[17px] text-muted">
-            Economia de hoje: <span className="text-white">R$ {kwh(s.incomeToday, 2)}</span>
-          </p>
-        )}
+      <section className="mt-6">
+        <SunBlob
+          todayKwh={kwh(s.todayKwh)}
+          subtitle={s.incomeToday != null ? `R$ ${kwh(s.incomeToday, 2)} de economia` : `${kwh(s.monthKwh, 0)} kWh no mês`}
+        />
       </section>
 
       <section className="mt-12 grid grid-cols-2 gap-3">
