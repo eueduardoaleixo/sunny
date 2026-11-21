@@ -3,7 +3,7 @@
 // 2. Crie um script novo, cole este código e troque a URL abaixo.
 // 3. Na tela inicial: segure > + > Scriptable > escolha o tamanho > toque no widget > Script: este.
 
-const APP_URL = "https://sunny-SEU.vercel.app";   // endereço do app Sunny
+const APP_URL = "https://sunny-gamma-two.vercel.app";   // endereço do app Sunny
 const TOKEN = "";                               // se você definiu SOLAR_TOKEN na Vercel, coloque aqui
 
 const SUN = new Color("#f5a524");
