@@ -33,7 +33,7 @@ function colorFor(intensity: number, elevation: number): RGB {
   return mix(DAWN, NOON, Math.min(1, intensity * 1.15));
 }
 
-type Props = { todayKwh: string; subtitle: string };
+type Props = { todayKwh: string; subtitle: string; lat?: number; lon?: number; placeName?: string };
 
 // Permite simular outra hora com ?hora=12 (ex.: para ver o efeito de noite)
 function now() {
@@ -47,7 +47,7 @@ function now() {
   return sim;
 }
 
-export default function SunBlob({ todayKwh, subtitle }: Props) {
+export default function SunBlob({ todayKwh, subtitle, lat = LAT, lon = LON, placeName = "Caruaru" }: Props) {
   const canvas = useRef<HTMLCanvasElement>(null);
   // Calculado só no navegador: a página é gerada antes, no servidor, e a hora muda
   const [state, setState] = useState<{ el: number; intensity: number } | null>(null);
@@ -55,13 +55,13 @@ export default function SunBlob({ todayKwh, subtitle }: Props) {
   // Posição do sol agora e a cada minuto
   useEffect(() => {
     const update = () => {
-      const el = sunElevation(now());
+      const el = sunElevation(now(), lat, lon);
       setState({ el, intensity: Math.max(0, Math.sin(rad(el))) });
     };
     const first = setTimeout(update, 0);
     const id = setInterval(update, 60000);
     return () => { clearTimeout(first); clearInterval(id); };
-  }, []);
+  }, [lat, lon]);
 
   useEffect(() => {
     const c = canvas.current;
@@ -79,7 +79,7 @@ export default function SunBlob({ todayKwh, subtitle }: Props) {
     const night = el <= 0;
     const energy = night ? 0.15 : 0.25 + intensity * 0.75;   // 0..1: quanto a bolha "vive"
     const cx = S / 2, cy = S / 2;
-    const R = S * (0.3 + energy * 0.08);
+    const R = S * (0.34 + energy * 0.08); // maior de dia, menor à noite
 
     // Partículas presas no anel
     const count = Math.round(30 + energy * 90);
@@ -148,10 +148,10 @@ export default function SunBlob({ todayKwh, subtitle }: Props) {
 
   return (
     <div>
-      <div className="relative mx-auto aspect-square w-full max-w-[360px]">
+      <div className="relative -mx-4 aspect-square sm:mx-auto sm:max-w-[440px]">
         <canvas ref={canvas} className="h-full w-full" aria-hidden="true" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span className="text-[64px] font-bold leading-none tracking-[-0.04em] tabular-nums">{todayKwh}</span>
+          <span className="text-[72px] font-bold leading-none tracking-[-0.04em] tabular-nums">{todayKwh}</span>
           <span className="mt-2 text-[14px] font-semibold uppercase tracking-[0.08em] text-muted">kWh hoje</span>
           <span className="mt-2 text-[15px] text-sun">{subtitle}</span>
         </div>
@@ -183,7 +183,7 @@ export default function SunBlob({ todayKwh, subtitle }: Props) {
           <span>Fraco</span><span>50%</span><span>Forte</span>
         </div>
         <p className="mt-3 text-[12px] text-muted">
-          Estimada pela posição do sol em Caruaru agora, com céu limpo. Nuvens não entram nessa conta.
+          Estimada pela posição do sol em {placeName} agora, com céu limpo. Nuvens não entram nessa conta.
         </p>
       </div>
     </div>

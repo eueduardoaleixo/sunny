@@ -4,18 +4,42 @@
 // 3. Na tela inicial: segure > + > Scriptable > escolha o tamanho > toque no widget > Script: este.
 
 const APP_URL = "https://sunny-gamma-two.vercel.app";   // endereço do app Sunny
-const TOKEN = "";                               // se você definiu SOLAR_TOKEN na Vercel, coloque aqui
+// A configuração vem do app: Ajustes > "Copiar código para o widget".
+// Na primeira vez, rode este script dentro do Scriptable para colar o código.
 
 const SUN = new Color("#f5a524");
 const MUTED = new Color("#8a8d91");
 const BG = new Color("#0b0b0b");
 
-async function carregar() {
-  const url = `${APP_URL}/api/solar${TOKEN ? `?t=${encodeURIComponent(TOKEN)}` : ""}`;
+async function configuracao() {
+  if (Keychain.contains("sunny-config")) return JSON.parse(Keychain.get("sunny-config"));
+  if (config.runsInWidget) return {};
+  const a = new Alert();
+  a.title = "Código do Sunny";
+  a.message = "No app Sunny: Ajustes > Copiar código para o widget. Cole aqui.";
+  a.addTextField("código");
+  a.addAction("Salvar");
+  a.addCancelAction("Pular");
+  if ((await a.present()) === -1) return {};
   try {
-    const r = new Request(url);
+    const json = Data.fromBase64String(a.textFieldValue(0).trim()).toRawString(); // API do Scriptable
+    Keychain.set("sunny-config", json);
+    return JSON.parse(json);
+  } catch {
+    return {};
+  }
+}
+
+async function carregar() {
+  const cfg = await configuracao();
+  try {
+    const r = new Request(`${APP_URL}/api/solar`);
+    r.method = "POST";
+    r.headers = { "content-type": "application/json" };
+    r.body = JSON.stringify(cfg);
     r.timeoutInterval = 20;
     const d = await r.loadJSON();
+    if (cfg.tariff != null) d.incomeToday = d.todayKwh * cfg.tariff;
     Keychain.set("sunny-ultimo", JSON.stringify(d));   // guarda para quando estiver sem internet
     return d;
   } catch {
