@@ -1,9 +1,9 @@
-// Widget "Solar" para o app Scriptable (iPhone)
+// Widget "Sunny" para o app Scriptable (iPhone)
 // 1. Instale o Scriptable (App Store, grátis).
 // 2. Crie um script novo, cole este código e troque a URL abaixo.
 // 3. Na tela inicial: segure > + > Scriptable > escolha o tamanho > toque no widget > Script: este.
 
-const APP_URL = "https://SEU-APP.vercel.app";   // endereço do web app Solar
+const APP_URL = "https://sunny-SEU.vercel.app";   // endereço do app Sunny
 const TOKEN = "";                               // se você definiu SOLAR_TOKEN na Vercel, coloque aqui
 
 const SUN = new Color("#f5a524");
@@ -16,10 +16,10 @@ async function carregar() {
     const r = new Request(url);
     r.timeoutInterval = 20;
     const d = await r.loadJSON();
-    Keychain.set("solar-ultimo", JSON.stringify(d));   // guarda para quando estiver sem internet
+    Keychain.set("sunny-ultimo", JSON.stringify(d));   // guarda para quando estiver sem internet
     return d;
   } catch {
-    return Keychain.contains("solar-ultimo") ? JSON.parse(Keychain.get("solar-ultimo")) : null;
+    return Keychain.contains("sunny-ultimo") ? JSON.parse(Keychain.get("sunny-ultimo")) : null;
   }
 }
 
@@ -47,7 +47,7 @@ async function montar() {
   sol.tintColor = SUN;
   sol.imageSize = new Size(16, 16);
   topo.addSpacer(6);
-  texto(topo, "Solar hoje", 13, MUTED);
+  texto(topo, "Sunny · hoje", 13, MUTED);
 
   w.addSpacer();
 

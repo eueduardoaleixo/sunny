@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Solar",
-    short_name: "Solar",
+    name: "Sunny",
+    short_name: "Sunny",
     description: "Geração do sistema solar Huawei",
     start_url: "/",
     display: "standalone",
